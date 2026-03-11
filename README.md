@@ -1,16 +1,60 @@
-# React + Vite
+# 🗂 Kanban Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive Kanban Task Management App built with React + Vite.
 
-Currently, two official plugins are available:
+![Kanban Board](screenshots/dark.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+- 📋 Three default columns: **Todo**, **In Progress**, **Done**
+- ➕ Add, edit, and delete tasks with title, description & priority
+- 🎯 Drag and drop tasks between columns
+- ✅ Tasks auto-complete with strikethrough when moved to Done
+- ⚡ Active indicator on In Progress tasks
+- 🔴🟡🟢 Priority labels (High, Medium, Low)
+- 🔍 Real-time search/filter
+- 🌙 Dark / Light mode toggle
+- 💾 localStorage persistence — tasks survive page refresh
+- ➕ Add custom columns
+- 📱 Fully responsive on mobile & desktop
+- 🎨 Glassmorphism UI with animated background
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠 Tech Stack
 
-## Expanding the ESLint configuration
+- **React** + **Vite**
+- **Tailwind CSS v4**
+- **@dnd-kit** — drag and drop
+- **Lucide React** — icons
+- **localStorage** — persistence
+- **Vercel** — deployment
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Live Demo
+
+[View Live App](<YOUR_VERCEL_LINK_HERE>)
+
+## 📸 Screenshots
+
+### Dark Mode
+![Dark Mode](screenshots/dark.png)
+
+### Light Mode
+![Light Mode](screenshots/light.png)
+
+## 🏃 Run Locally
+```bash
+git clone https://github.com/snehakar1435/kanban-app.git
+cd kanban-app
+npm install
+npm run dev
+```
+
+## 📁 Project Structure
+```
+src/
+├── components/
+│   ├── Board.jsx      # DnD context & column layout
+│   ├── Column.jsx     # Column with add task form
+│   └── TaskCard.jsx   # Draggable task card
+├── App.jsx            # Main app with dark mode & search
+└── index.css          # Glassmorphism styles
+```
