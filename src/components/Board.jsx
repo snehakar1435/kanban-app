@@ -1,12 +1,19 @@
 import { useState } from 'react'
 import Column from './Column'
 import { DndContext, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { Plus } from 'lucide-react'
 
-export default function Board({ data, setData, search }) {
+export default function Board({ data, setData, search, darkMode }) {
   const [newColTitle, setNewColTitle] = useState('')
   const [addingCol, setAddingCol] = useState(false)
 
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3,
+      },
+    })
+  )
 
   function handleDragEnd(event) {
     const { active, over } = event
@@ -77,7 +84,7 @@ export default function Board({ data, setData, search }) {
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 p-6 overflow-x-auto min-h-[calc(100vh-72px)] items-start">
+      <div className="flex gap-5 p-6 overflow-x-auto min-h-[calc(100vh-72px)] items-start">
         {data.columnOrder.map(colId => (
           <Column
             key={colId}
@@ -87,30 +94,60 @@ export default function Board({ data, setData, search }) {
             setData={setData}
             search={search}
             onDeleteColumn={() => deleteColumn(colId)}
+            darkMode={darkMode}
           />
         ))}
-        <div className="min-w-[280px]">
+
+        <div className="min-w-[300px]">
           {addingCol ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow flex flex-col gap-2">
+            <div className="rounded-2xl p-4 flex flex-col gap-3 shadow-xl"
+              style={{
+                background: darkMode ? 'rgba(15,23,42,0.6)' : 'rgba(255,255,255,0.7)',
+                backdropFilter: 'blur(16px)',
+                border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.8)'
+              }}
+            >
               <input
                 autoFocus
                 value={newColTitle}
                 onChange={e => setNewColTitle(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addColumn()}
                 placeholder="Column name..."
-                className="border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white"
+                style={{
+                  background: darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.04)',
+                  border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.08)'
+                }}
               />
               <div className="flex gap-2">
-                <button onClick={addColumn} className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">Add</button>
-                <button onClick={() => setAddingCol(false)} className="text-gray-500 px-3 py-1 rounded text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                <button
+                  onClick={addColumn}
+                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white liquid-btn shadow"
+                  style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+                >
+                  Add Column
+                </button>
+                <button
+                  onClick={() => setAddingCol(false)}
+                  className="px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           ) : (
             <button
               onClick={() => setAddingCol(true)}
-              className="w-full bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl px-4 py-3 text-sm font-medium shadow transition"
+              className="w-full flex items-center justify-center gap-2 rounded-2xl px-4 py-4 text-sm font-medium transition-all liquid-btn"
+              style={{
+                background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)',
+                backdropFilter: 'blur(12px)',
+                border: darkMode ? '1px dashed rgba(255,255,255,0.15)' : '1px dashed rgba(0,0,0,0.15)',
+                color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'
+              }}
             >
-              + Add Column
+              <Plus size={16} />
+              Add Column
             </button>
           )}
         </div>

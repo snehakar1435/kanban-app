@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Board from './components/Board'
+import { Search, Moon, Sun, LayoutDashboard } from 'lucide-react'
 
 const initialData = {
   tasks: {},
@@ -11,40 +12,18 @@ const initialData = {
   columnOrder: ['col-1', 'col-2', 'col-3'],
 }
 
-function KanbanLogo() {
-  return (
-    <div className="flex items-center gap-3">
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="40" height="40" rx="10" fill="#fff"/>
-        <rect x="5" y="8" width="8" height="24" rx="2.5" fill="#4285F4"/>
-        <rect x="16" y="8" width="8" height="16" rx="2.5" fill="#FBBC05"/>
-        <rect x="27" y="8" width="8" height="10" rx="2.5" fill="#34A853"/>
-        <circle cx="31" cy="30" r="5" fill="#EA4335"/>
-        <path d="M29 30l1.5 1.5L33 28" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-      <div className="flex flex-col leading-tight">
-        <span className="text-xl font-black tracking-tight">
-          <span className="text-[#4285F4]">K</span>
-          <span className="text-[#EA4335]">a</span>
-          <span className="text-[#FBBC05]">n</span>
-          <span className="text-[#4285F4]">b</span>
-          <span className="text-[#34A853]">a</span>
-          <span className="text-[#EA4335]">n</span>
-          <span className="text-gray-500 dark:text-gray-400 font-semibold"> Board</span>
-        </span>
-        <span className="text-[10px] tracking-widest text-gray-400 uppercase font-medium">Task Manager</span>
-      </div>
-    </div>
-  )
-}
-
 export default function App() {
   const [darkMode, setDarkMode] = useState(() =>
     localStorage.getItem('darkMode') === 'true'
   )
   const [data, setData] = useState(() => {
     const saved = localStorage.getItem('kanban-data')
-    return saved ? JSON.parse(saved) : initialData
+    if (!saved) return initialData
+    const parsed = JSON.parse(saved)
+    const merged = { ...initialData, ...parsed }
+    merged.columns = { ...initialData.columns, ...parsed.columns }
+    merged.columnOrder = [...new Set([...initialData.columnOrder, ...parsed.columnOrder])]
+    return merged
   })
   const [search, setSearch] = useState('')
 
@@ -61,27 +40,91 @@ export default function App() {
     }
   }, [darkMode])
 
+  const totalTasks = Object.keys(data.tasks).length
+  const doneTasks = Object.values(data.tasks).filter(t => t.done).length
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      <header className="bg-white dark:bg-gray-800 shadow-sm px-6 py-3 flex items-center justify-between">
-        <KanbanLogo />
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
-            placeholder="🔍 Search tasks..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="border rounded-full px-4 py-1.5 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 w-48"
-          />
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="text-xl px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition border dark:border-gray-600"
-          >
-            {darkMode ? '🌙' : '☀️'}
-          </button>
+    <div className="min-h-screen transition-colors duration-500"
+      style={{
+        background: darkMode
+          ? 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)'
+          : 'linear-gradient(135deg, #e0e7ff 0%, #f0fdf4 50%, #fef9c3 100%)'
+      }}
+    >
+      {/* Floating background blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-5%] w-72 h-72 rounded-full opacity-20 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #6366f1, transparent)' }} />
+        <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 rounded-full opacity-20 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #ec4899, transparent)' }} />
+        <div className="absolute top-[40%] left-[40%] w-64 h-64 rounded-full opacity-10 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #22c55e, transparent)' }} />
+      </div>
+
+      {/* Header */}
+      <header className="relative z-10 px-6 py-4"
+        style={{
+          background: darkMode ? 'rgba(15,23,42,0.6)' : 'rgba(255,255,255,0.5)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.6)'
+        }}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg float"
+              style={{ background: 'linear-gradient(135deg, #4285F4, #EA4335, #FBBC05, #34A853)' }}
+            >
+              <LayoutDashboard size={20} color="white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-black tracking-tight">
+                <span style={{ color: '#4285F4' }}>K</span>
+                <span style={{ color: '#EA4335' }}>a</span>
+                <span style={{ color: '#FBBC05' }}>n</span>
+                <span style={{ color: '#4285F4' }}>b</span>
+                <span style={{ color: '#34A853' }}>a</span>
+                <span style={{ color: '#EA4335' }}>n</span>
+                <span className="text-gray-500 dark:text-gray-400 font-semibold"> Board</span>
+              </h1>
+              <p className="text-[10px] text-gray-400 tracking-widest uppercase">
+                {doneTasks}/{totalTasks} tasks complete
+              </p>
+            </div>
+          </div>
+
+          {/* Search + Toggle */}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search tasks..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-8 pr-4 py-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 w-48 dark:text-white"
+                style={{
+                  background: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.7)',
+                  border: darkMode ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(0,0,0,0.08)',
+                  backdropFilter: 'blur(8px)'
+                }}
+              />
+            </div>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all liquid-btn shadow-md"
+              style={{
+                background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+                border: darkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.08)'
+              }}
+            >
+              {darkMode ? <Moon size={16} className="text-blue-300" /> : <Sun size={16} className="text-yellow-500" />}
+            </button>
+          </div>
         </div>
       </header>
-      <Board data={data} setData={setData} search={search} />
+
+      <Board data={data} setData={setData} search={search} darkMode={darkMode} />
     </div>
   )
 }
